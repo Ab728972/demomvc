@@ -4,35 +4,23 @@ namespace DemoMvc
     {
         public static void Main(string[] args)
         {
-            //CreateHostBuilder(args).Build().Run();
+            var builder = WebApplication.CreateBuilder(args);
 
-            var builder = WebApplication.CreateBuilder();
-
-            // ConfigureServices => builder.Services
+            // builder.Services.AddControllers(); // API
+            builder.Services.AddControllersWithViews(); // MVC
 
             var app = builder.Build();
 
-            #region Configure
-            if (app.Environment.IsDevelopment())
-            {
-                // ...
-            }
+            app.UseStaticFiles(); // wwwroot
 
-            app.MapGet("/", async context =>
-            {
-                await context.Response.WriteAsync("Hello World!");
-            });
+            // Minimal API
+            // app.MapGet("/", () => "Hello World!");
 
-            #endregion
+            app.MapControllerRoute(
+                name: "Default",
+                pattern: "{Controller=Home}/{Action=Index}/{id?}");
 
             app.Run();
         }
-
-        //public static IHostBuilder CreateHostBuilder(string[] args) =>
-        //    Host.CreateDefaultBuilder(args)
-        //        .ConfigureWebHostDefaults(webBuilder =>
-        //        {
-        //             webBuilder.UseStartup<Startup>();
-        //        });
     }
 }

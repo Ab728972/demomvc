@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<center>
+    <div class="mt-3">
+        <a class="btn btn-primary" href="/Home/Index">Home</a>
+
+        <a class="btn btn-warning" href="/Home/Privacy">Privacy</a>
+
+        <a class="btn btn-success" href="/Home/ContactUs">ContactUs</a>
+
+        <a class="btn btn-danger" href="/Home/AboutUs">AboutUs</a>
+
+        <a class="btn btn-secondary" href="/Accounts/Login">Login</a>
+    </div>
+
+    <div class="mt-5">
+        <h1>Hello From Home Today is @DateTime.Now</h1>
+    </div>
+</center>
+
+<footer class="fixed-bottom">
+    <center>
+        <p>CopyRights &copy; @DateTime.Now.Year</p>
+    </center>
+</footer>
