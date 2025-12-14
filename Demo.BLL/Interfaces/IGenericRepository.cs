@@ -7,5 +7,9 @@
         int Add(T entity);
         int Update(T entity);
         int Delete(T entity);
+       
+        Task<IEnumerable<T>> GetAllAsync();
+        Task<T> GetAsync(int id);
+        Task AddAsync(T entity);
     }
 }

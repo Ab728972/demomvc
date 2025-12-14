@@ -11,4 +11,5 @@ namespace Demo.PL.MappingProfiles
             CreateMap<Employee, Employee>().ReverseMap();
         }
     }
+    CreateMap<EmployeeViewModel, Employee>().ReverseMap();
 }

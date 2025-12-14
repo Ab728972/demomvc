@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
 using Demo.BLL.Interfaces;
 using Demo.DAL.Models;
+using Demo.PL.Helpers;
+using Demo.PL.ViewModels; // تأكد من الـ using ده
 using Microsoft.AspNetCore.Mvc;
 
 namespace Demo.PL.Controllers
 {
     public class EmployeeController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork; // التغيير هنا
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
         public EmployeeController(IUnitOfWork unitOfWork, IMapper mapper)
@@ -16,103 +18,44 @@ namespace Demo.PL.Controllers
             _mapper = mapper;
         }
 
-        // 1. Index (With Search)
-        public IActionResult Index(string searchInp)
+        // 1. Index (Async)
+        public async Task<IActionResult> Index(string searchInp)
         {
             var employees = Enumerable.Empty<Employee>();
 
             if (string.IsNullOrEmpty(searchInp))
-                employees = _unitOfWork.EmployeeRepository.GetAll();
+                employees = await _unitOfWork.EmployeeRepository.GetAllAsync(); // استخدام النسخة الـ Async
             else
-                employees = _unitOfWork.EmployeeRepository.GetEmployeesByName(searchInp);
+                employees = _unitOfWork.EmployeeRepository.GetEmployeesByName(searchInp); // دي لسه Sync عادي
 
-            return View(employees);
+            return View(_mapper.Map<IEnumerable<EmployeeViewModel>>(employees));
         }
 
-        // 2. Create
+        // 2. Create (With Image Upload)
         [HttpGet]
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() { return View(); }
 
         [HttpPost]
-        public IActionResult Create(Employee employee)
+        public async Task<IActionResult> Create(EmployeeViewModel employeeVM)
         {
             if (ModelState.IsValid)
             {
-                // استخدام UnitOfWork
-                _unitOfWork.EmployeeRepository.Add(employee);
-                // _unitOfWork.Complete(); // لو الـ Add في الـ GenericRepo بتعمل Save، مش محتاجين دي هنا
+                // Upload Image
+                if (employeeVM.Image is not null)
+                {
+                    employeeVM.ImageName = DocumentSettings.UploadFile(employeeVM.Image, "images");
+                }
 
-                TempData["Message"] = "Employee Created Successfully!!";
+                var employee = _mapper.Map<Employee>(employeeVM);
+
+                await _unitOfWork.EmployeeRepository.AddAsync(employee);
+                // _unitOfWork.Complete(); // لو AddAsync بتعمل Save
+
+                TempData["Message"] = "Created Successfully";
                 return RedirectToAction(nameof(Index));
             }
-            return View(employee);
+            return View(employeeVM);
         }
 
-        // 3. Details
-        public IActionResult Details(int? id, string viewName = "Details")
-        {
-            if (id is null) return BadRequest();
-            var employee = _unitOfWork.EmployeeRepository.Get(id.Value);
-            if (employee is null) return NotFound();
-
-            return View(viewName, employee);
-        }
-
-        // 4. Edit
-        [HttpGet]
-        public IActionResult Edit(int? id)
-        {
-            return Details(id, "Edit");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int id, Employee employee)
-        {
-            if (id != employee.Id) return BadRequest();
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _unitOfWork.EmployeeRepository.Update(employee);
-                    TempData["Message"] = "Employee Updated Successfully!!";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError(string.Empty, ex.Message);
-                }
-            }
-            return View(employee);
-        }
-
-        // 5. Delete
-        [HttpGet]
-        public IActionResult Delete(int? id)
-        {
-            return Details(id, "Delete");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Delete([FromRoute] int id, Employee employee)
-        {
-            if (id != employee.Id) return BadRequest();
-            try
-            {
-                _unitOfWork.EmployeeRepository.Delete(employee);
-                TempData["Message"] = "Employee Deleted Successfully!!";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View(employee);
-            }
-        }
     }
 }
