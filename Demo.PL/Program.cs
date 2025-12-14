@@ -1,8 +1,9 @@
 using Demo.BLL.Interfaces;
 using Demo.BLL.Repositories;
 using Demo.DAL.Contexts;
-using Microsoft.EntityFrameworkCore; // <--- Ïå ÇáÓØÑ Çááí ßÇä äÇÞÕ æãÓÈÈ ÇáãÔßáÉ
-
+using Demo.DAL.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore; 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +16,8 @@ builder.Services.AddDbContext<CompanyDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -34,5 +37,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+.AddEntityFrameworkStores<CompanyDbContext>()
+.AddDefaultTokenProviders();
 
 app.Run();

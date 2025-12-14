@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using Demo.DAL.Models;
-using Microsoft.EntityFrameworkCore; // <--- تأكد إن السطر ده موجود
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore; // مهم جداً
+using Microsoft.EntityFrameworkCore;
 
 namespace Demo.DAL.Contexts
 {
-    public class CompanyDbContext : DbContext
+    // غير الوراثة لـ IdentityDbContext<ApplicationUser>
+    public class CompanyDbContext : IdentityDbContext<ApplicationUser>
     {
-        // الـ Constructor ده ضروري عشان ياخد الـ Options من الـ Program.cs ويبعتها للأب (base)
         public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options)
         {
         }
 
         public DbSet<Department> Departments { get; set; }
-        public DbSet<Employee> Employees { get; set; } 
+        public DbSet<Employee> Employees { get; set; }
     }
 }
