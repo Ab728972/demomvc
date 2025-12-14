@@ -12,6 +12,16 @@
         @TempData["Message"]
     </div>
 }
+<div class="m-2">
+    <form asp-action="Index" class="row col-8 offset-1">
+        <div class="col-8">
+            <input type="text" class="form-control" name="searchInp" placeholder="Search By Name..." />
+        </div>
+        <div class="col-4">
+            <input type="submit" value="Search" class="btn btn-info" />
+        </div>
+    </form>
+</div>
 
 @if (Model.Any())
 {
