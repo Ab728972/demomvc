@@ -1,3 +1,5 @@
+using Demo.BLL.Interfaces;
+using Demo.BLL.Repositories;
 using Demo.DAL.Contexts;
 using Microsoft.EntityFrameworkCore; // <--- Ïå ÇáÓØÑ Çááí ßÇä äÇÞÕ æãÓÈÈ ÇáãÔßáÉ
 
@@ -9,6 +11,8 @@ builder.Services.AddControllersWithViews();
 // ÊÓÌíá ÇáÜ DbContext
 builder.Services.AddDbContext<CompanyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 
 var app = builder.Build();
 
