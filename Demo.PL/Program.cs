@@ -13,7 +13,8 @@ builder.Services.AddDbContext<CompanyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
