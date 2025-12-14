@@ -21,11 +21,39 @@ namespace Demo.PL.Controllers
         [HttpGet] public IActionResult Create() => View();
 
         [HttpPost]
-        public IActionResult Create(Employee employee)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit([FromRoute] int id, Employee employee)
         {
-            if (ModelState.IsValid) { _repo.Add(employee); return RedirectToAction(nameof(Index)); }
+            if (id != employee.Id) return BadRequest();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _repo.Update(employee); 
+
+                    
+                    TempData["Message"] = "Employee Updated Successfully!!";
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
             return View(employee);
         }
-        // باقي الدوال (Details, Edit, Delete) انسخها من Department وغير الاسم بس
+        public IActionResult Create(Employee employee)
+        {
+            if (ModelState.IsValid)
+            {
+                _repo.Add(employee);
+                TempData["Message"] = "Employee Created Successfully!!"; 
+                return RedirectToAction(nameof(Index));
+            }
+            return View(employee);
+        
     }
 }
